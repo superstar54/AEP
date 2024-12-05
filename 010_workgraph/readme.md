@@ -25,6 +25,7 @@
    - [WorkChain Version](#workchain-version)  
    - [WorkGraph Version](#workgraph-version)  
 4. [Design Considerations](#design-considerations)
+   - [Do not need PYTHONPATH](#do-not-need-pythonpath)
    - [Dynamic namespace](#dynamic-namespace)  
    - [Advantages over `WorkChain`](#advantages-over-workchain)  
    - [When to Use `WorkGraph`](#when-to-use-workgraph)  
@@ -217,6 +218,11 @@ wg.add_link(wg.tasks["add"].outputs[0], wg.tasks["divide"].inputs["x"])
 ```
 
 ## Design Considerations
+
+### Do not need PYTHONPATH
+In order to submit the `WorkChain` to the AiiDA daemon, the daemon needs to know where to import the `WorkChain`. This means that one need to add the directory that contains the `WorkChain` to the `PYTHONPATH`, and restart the daemon. This limits the usage of the `WorkChain` in the interactive environment like the Jupiter notebook or other environments.
+
+In the `WorkGraph`, compose workflow using other AiiDA components (`CalcJob`, `WorkChain`, etc.) does not require to add the directory to the `PYTHONPATH`, because all the information of the workflow, i.e., the executors of the tasks and the connections between them, are passed as inputs of the `WorkGraphEngine`, so that the engine have all the information to execute the workflow, without the need to know where the `WorkGraph` is defined.
 
 ### Dynamic namespace
 In AiiDA, one can define a dynamic namespace for the process, which allows the user to pass any nested dictionary with AiiDA data nodes as values. However, in the `WorkGraph`, we need to define the input and output sockets explicitly, so that one can make a link between tasks. To address this discrepancy, and still allow user to pass any nested dictionary with AiiDA data nodes, as well as the output sockets of other tasks, we automatically create the input for each item in the dictionary if the input is not defined. Besides, if the value of the item is a socket, we will link the socket to the task, and remove the item from the dictionary.

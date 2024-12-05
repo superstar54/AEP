@@ -24,7 +24,8 @@
 3. [Example Usage](#example-usage)  
    - [WorkChain Version](#workchain-version)  
    - [WorkGraph Version](#workgraph-version)  
-4. [Design Considerations](#design-considerations)  
+4. [Design Considerations](#design-considerations)
+   - [Dynamic namespace](#dynamic-namespace)  
    - [Advantages over `WorkChain`](#advantages-over-workchain)  
    - [When to Use `WorkGraph`](#when-to-use-workgraph)  
    - [When to Use `WorkChain`](#when-to-use-workchain)  
@@ -216,6 +217,22 @@ wg.add_link(wg.tasks["add"].outputs[0], wg.tasks["divide"].inputs["x"])
 ```
 
 ## Design Considerations
+
+### Dynamic namespace
+In AiiDA, one can define a dynamic namespace for the process, which allows the user to pass any nested dictionary with AiiDA data nodes as values. However, in the `WorkGraph`, we need to define the input and output sockets explicitly, so that one can make a link between tasks. To address this discrepancy, and still allow user to pass any nested dictionary with AiiDA data nodes, as well as the output sockets of other tasks, we automatically create the input for each item in the dictionary if the input is not defined. Besides, if the value of the item is a socket, we will link the socket to the task, and remove the item from the dictionary.
+
+For example, the `WorkChainWithDynamicNamespace` has a dynamic namespace `dynamic_port`, and the user can pass any nested dictionary as the input.
+
+```python
+task2 = wg.add_task(
+        WorkChainWithDynamicNamespace,
+        dynamic_port={
+            "input1": None,
+            "input2": orm.Int(2),
+            "input3": task1.outputs["result"],
+        },
+    )
+```
 
 ### Advantages over `WorkChain`
 

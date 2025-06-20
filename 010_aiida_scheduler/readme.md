@@ -20,16 +20,17 @@
    * [Scheduler Core](#scheduler-core)
    * [Daemonization via Circus](#daemonization-via-circus)
    * [CLI Extensions](#cli-extensions)
-   * [Persistent State: `SchedulerNode`](#persistent-state-schedulernode)
+   * [Persistent State: ](#persistent-state-schedulernode)[`SchedulerNode`](#persistent-state-schedulernode)
    * [REST API Endpoints](#rest-api-endpoints)
    * [GUI Integration](#gui-integration)
 3. [Detailed Design](#detailed-design)
 4. [Implementation Reference](#implementation-reference)
-5. [Backwards Compatibility](#backwards-compatibility)
-6. [Alternatives Considered](#alternatives-considered)
-7. [Unresolved Questions](#unresolved-questions)
-8. [Future Work](#future-work)
-9. [Conclusion](#conclusion)
+5. [Performance Characteristics](#performance-characteristics)
+6. [Backwards Compatibility](#backwards-compatibility)
+7. [Alternatives Considered](#alternatives-considered)
+8. [Unresolved Questions](#unresolved-questions)
+9. [Future Work](#future-work)
+10. [Conclusion](#conclusion)
 
 ---
 
@@ -145,6 +146,17 @@ A proof‑of‑concept lives in **aiida‑workgraph**:
 * `cli/cmd_scheduler.py` – CLI group
 * `plugins/scheduler/api.py` – REST router
 * `frontend/src/plugins/Scheduler` – GUI components
+
+---
+
+## Performance Characteristics
+
+* **Minimal memory footprint:** Each scheduler keeps only the *primary keys* of waiting/running processes plus a handful of counters. Even with millions of tasks, resident memory remains in the low‑MB range and grows linearly with the number of *running* processes, not total history.
+Here's an improved version of the sentence that reflects the presence of a fallback mechanism while emphasizing the efficiency of the event-driven approach:
+**Event-driven execution (no active polling):** CPU usage remains near zero during idle periods, as no continuous database scans are performed. A lightweight fallback mechanism with periodic polling (every 5 minutes) ensures robustness with minimal computational overhead.
+* **Lightweight prioritisation:** Retrieving the next process is a single indexed query (`ORDER BY priority LIMIT 1`). The cost is negligible compared with CalcJob runtimes.
+* **Daemon‑worker scalability preserved:** Scheduler never touches workers’ internal queues; processes still fan out to as many AiiDA daemon workers as you launch, retaining horizontal scalability.
+* **No central bottleneck:** Users can start multiple independent schedulers, e.g. one per HPC allocation, so no single controller can throttle throughput.
 
 ---
 

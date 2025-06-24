@@ -31,7 +31,8 @@
    * [Integration with AiiDA Core](#integration-with-aiida-core)
    * [Performance and Scalability](#performance-and-scalability)
    * [Extensibility and Maintainability](#extensibility-and-maintainability)
-6. [Conclusion](#conclusion)
+6. [Optional apps integration](#optional-apps-integration)
+7. [Conclusion](#conclusion)
 
 ---
 
@@ -44,7 +45,7 @@ AiiDA’s command-line interface (CLI) is powerful and scriptable, yet many user
 
 ## Proposed Enhancement
 
-Provide a standalone web-based graphical interface for AiiDA, **AiiDA GUI**, that allows users to inspect and control processes, explore data nodes in rich viewers, and extend its functionality through plugins and “apps.”
+Provide a standalone web-based graphical interface for AiiDA, **AiiDA GUI**, that allows users to inspect and control processes, explore data nodes in rich viewers, and extend its functionality through plugins.
 
 
 ### Key Features
@@ -68,14 +69,10 @@ Provide a standalone web-based graphical interface for AiiDA, **AiiDA GUI**, tha
   * `CalcJob` viewers similar to Materials Cloud.
   * Provenance graph visualization or table: inputs, outputs, and dependencies.
 
-* **Plugin & App Ecosystem**
+* **Plugin Ecosystem**
 
   * Load frontend dynamically into sidebar, new pages or data viewers.
   * Shared React component library (`aiida-react-components-base`) published to npm
-
-* **Apps Page**
-
-  * Discover and launch self-contained “apps” (standalone frontends)
 
 * **CLI Integration**
 
@@ -94,10 +91,10 @@ Provide a standalone web-based graphical interface for AiiDA, **AiiDA GUI**, tha
 
 ### Backend: FastAPI & aiida-restapi
 
-* **Leverage** the existing [aiida-restapi](https://github.com/aiidateam/aiida-restapi) endpoints wherever possible.
+* **Leverage** the existing [aiida-restapi](https://github.com/aiidateam/aiida-restapi) endpoints, adding new ones as needed.
 * **Refactor** aiida-restapi to allow query-time projections and filters (e.g. selecting only certain columns).
-* **Expose** new routes for plugin registration, and app discovery.
-* **Mount** plugin routers automatically by scanning entry points under `aiida_gui.plugins` and `aiida_gui.apps`.
+* **Expose** new routes for plugin registration and discovery.
+* **Mount** plugin routers automatically by scanning entry points under `aiida_gui.plugins`.
 
 ### Frontend: React & Component Library
 
@@ -115,12 +112,6 @@ Provide a standalone web-based graphical interface for AiiDA, **AiiDA GUI**, tha
 
 * **Backend:** Plugins declare entry points under `aiida_gui.plugins` which provide a FastAPI Router. On startup, the core app includes these routers under `/plugins/{name}`.
 * **Frontend:** Plugins publish an ESM bundle, with its entry describing routes and components to mount in the sidebar or as standalone pages. The core React app loads and mounts these dynamically.
-
-### Apps Integration
-
-* **Self-contained apps** are packaged as static HTML/JS/CSS under `/apps/{app_name}/`.
-* The core GUI provides a directory listing with icons and metadata for each registered app.
-* Apps can still call core REST endpoints (with CORS enabled internally) and reuse shared components via the npm package.
 
 ### CLI & Deployment
 
@@ -181,6 +172,16 @@ The plugin’s sidebar entry appears; clicking it loads its custom page and data
 
 ---
 
+## Optional apps integration
+
+Apps differ from standard plugins, which are JavaScript modules dynamically loaded into the core GUI. Instead, apps are collections of AiiDA GUI applications delivered as fully self-contained static bundles (HTML, JS, and CSS) that run independently of the main React router. They provide complete, task-specific frontends with their own UI and workflow logic, while still interacting with AiiDA via its REST API, e.g., a DFT app that submits Quantum Espresso calculations, streams job status, and visualizes results.
+
+* **Packaging:** apps are static HTML/JS/CSS bundles under `/apps/{app_name}/` deployed alongside the core GUI.
+* **Discovery and launch:** the GUI’s "Apps" page lists installed apps with names, icons, and metadata; users can launch them directly in a new tab or window.
+* **Reuse:** apps may import shared components from `aiida-react-components-base` to maintain a consistent UX.
+
+---
+
 ## Conclusion
 
-The proposed AiiDA GUI brings a modern, user-friendly interface to AiiDA, reducing the learning curve and enabling rich, interactive exploration of workflows and data. By building on FastAPI and React, and embracing a plugin-and-apps ecosystem, the GUI will be flexible, performant, and easily extensible by the community. This enhancement promises to accelerate AiiDA adoption and catalyze the development of domain-specific extensions and apps.
+The proposed AiiDA GUI brings a modern, user-friendly interface to AiiDA, reducing the learning curve and enabling rich, interactive exploration of workflows and data. By building on FastAPI and React, and embracing a plugin ecosystem, the GUI will be flexible, performant, and easily extensible by the community. This enhancement promises to accelerate AiiDA adoption and catalyze the development of domain-specific extensions.

@@ -4,7 +4,7 @@
 |------------|--------------------------------------------------------------|
 | Title      | 	A dedicated Graphical User Interface for AiiDA            |
 | Authors    | [Xing Wang](mailto:xingwang1991@gmail.com) (superstar54)     |
-| Champions  | [Xing Wang](mailto:xingwang1991@gmail.com) (superstar54)     |
+| Champions  | [Xing Wang](mailto:xingwang1991@gmail.com) (superstar54), [Edan Bainglass](mailto:edan.bainglass@psi.ch) (edan-bainglass) [Kristjan Eimre](mailto:kristjaneimre@gmail.com) ( eimrek), [Bud Macaulay](mailto:bud.macaulay@psi.ch) (bud-macaulay)|
 | Type       | S - Standard Track AEP                                       |
 | Created    | 18-June-2025                                                 |
 | Status     | Draft  

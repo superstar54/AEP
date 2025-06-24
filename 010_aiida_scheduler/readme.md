@@ -125,15 +125,22 @@ Mounted under `/plugins/scheduler/api` (FastAPI):
 A React plugin for **aiida‑gui** provides:
 
 * A **Scheduler list** (DataGrid) with start/stop buttons and live counts.
+
+![Figure 1 – GUI scheduler list](aiida-scheduler-gui-list.png).
+
 * A **Detail view** with editable limits and a real‑time line chart of running vs waiting processes.
+
+![Figure 2 – GUI detail view](aiida-scheduler-gui-detail.png).
+
 * A **Process table** showing individual jobs with play/pause/kill & priority editing.
+
 
 ---
 
 ## Detailed Design
 
 Figure 1 illustrates the interplay between user submission, RabbitMQ, the new Scheduler daemon, AiiDA daemon workers, and the database.
-![Figure 1 – AiiDA process execution flow with Scheduler](aiida-scheduler.png).
+![Figure 2 – AiiDA process execution flow with Scheduler](aiida-scheduler.png).
 
 ---
 
